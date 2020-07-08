@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import {
   SafeAreaView,
@@ -10,9 +10,23 @@ import {
   TouchableOpacity,
 } from "react-native";
 
+
 export default function App() {
+const [repositories, setRepositories] = useState([]);
+
   async function handleLikeRepository(id) {
     // Implement "Like Repository" functionality
+  }
+
+  async function handleAddRepository(){
+
+    const response = await api.post('repositories',{
+      title:'teste',
+      url:"github.com",
+      techs:'teste techs'
+    })
+    const repository = response.data;
+    setRepositories([...repositories, repository])
   }
 
   return (
@@ -20,14 +34,11 @@ export default function App() {
       <StatusBar barStyle="light-content" backgroundColor="#7159c1" />
       <SafeAreaView style={styles.container}>
         <View style={styles.repositoryContainer}>
-          <Text style={styles.repository}>Repository 1</Text>
+          <Text style={styles.repository}>{repository=>repository.title}</Text>
 
-          <View style={styles.techsContainer}>
+          <View style={styles.techsContainer}>          
             <Text style={styles.tech}>
-              ReactJS
-            </Text>
-            <Text style={styles.tech}>
-              Node.js
+              {repository=>repository.tech}
             </Text>
           </View>
 
@@ -37,13 +48,13 @@ export default function App() {
               // Remember to replace "1" below with repository ID: {`repository-likes-${repository.id}`}
               testID={`repository-likes-1`}
             >
-              3 curtidas
+              {repository=>repository.likes}
             </Text>
           </View>
 
           <TouchableOpacity
             style={styles.button}
-            onPress={() => handleLikeRepository(1)}
+            onPress={() => handleLikeRepository(repository=>repository.id)}
             // Remember to replace "1" below with repository ID: {`like-button-${repository.id}`}
             testID={`like-button-1`}
           >
