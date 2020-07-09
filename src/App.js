@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-
+import React, { useEffect, useState } from "react";
+import api from './services/api';
 import {
   SafeAreaView,
   View,
@@ -8,28 +8,23 @@ import {
   StatusBar,
   StyleSheet,
   TouchableOpacity,
-} from 'react-native';
+} from "react-native";
 
-import api from './services/api';
 
 export default function App() {
-  const [repositories, setRepositories] = useState([]);
-
-  useEffect(() => {
-    api.get('/repositories')
-      .then(response => setRepositories(response.data));
-  }, []);
+const [repositories, setRepositories] = useState([]);
+useEffect(() => { api.get('repositories').then(response => { setRepositories(response.data) }) }, [])
 
   async function handleLikeRepository(id) {
     // Implement "Like Repository" functionality
   }
 
-  async function handleAddRepository() {
+  async function handleAddRepository(){
 
     const response = await api.post('repositories',{
-      title: 'teste',
-      url: 'github.com',
-      techs: 'teste techs'
+      title:'teste',
+      url:"github.com",
+      techs:'teste techs'
     })
     const repository = response.data;
     setRepositories([...repositories, repository])
@@ -39,38 +34,44 @@ export default function App() {
     <>
       <StatusBar barStyle="light-content" backgroundColor="#7159c1" />
       <SafeAreaView style={styles.container}>
-        {repositories.map(repository => (
-          <View style={styles.repositoryContainer}>
-            <Text style={styles.repository}>{repository.title}</Text>
-
-            <View style={styles.techsContainer}>
-            {repository.techs.map(tech => (
-              <Text style={styles.tech} key={tech}>
-                {tech}
-              </Text>
-            ))}     
-            </View>
-
-            <View style={styles.likesContainer}>
-              <Text
-                style={styles.likeText}
-                // Remember to replace "1" below with repository ID: {`repository-likes-${repository.id}`}
-                testID={`repository-likes-1`}
-              >
-                {repository.likes}
-              </Text>
-            </View>
-
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => handleLikeRepository(repository.id)}
-              // Remember to replace "1" below with repository ID: {`like-button-${repository.id}`}
-              testID={`like-button-1`}
-            >
-              <Text style={styles.buttonText}>Curtir</Text>
-            </TouchableOpacity>
+        <View style={styles.repositoryContainer}>        
+          <FlatList
+                    data={repositories}
+                    keyExtractor={repository => repository.id}
+                    renderItem={({ item: repository }) => (
+                        <Text style={styles.repository}>{repository.title}</Text>
+                    )}
+                />
+          <View style={styles.techsContainer}>          
+          <FlatList
+                    data={repositories}
+                    keyExtractor={repository => repository.id}
+                    renderItem={({ item: repository }) => (
+                        <Text style={styles.tech}>{repository.techs}</Text>
+                    )}
+                />
           </View>
-        ))}
+
+          <View style={styles.likesContainer}>
+            
+            <FlatList
+                    data={repositories}
+                    keyExtractor={repository => repository.id}
+                    renderItem={({ item: repository }) => (
+                        <Text style={styles.likeText}>{repository.likes}</Text>
+                    )}
+                />
+          </View>
+
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => handleLikeRepository(repository=>repository.id)}
+            // Remember to replace "1" below with repository ID: {`like-button-${repository.id}`}
+            
+          >
+            <Text style={styles.buttonText}>Curtir</Text>
+          </TouchableOpacity>
+        </View>
       </SafeAreaView>
     </>
   );
